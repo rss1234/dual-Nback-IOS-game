@@ -1,3 +1,12 @@
+# -*- coding: utf-8 -*-
+"""
+@File ：main.py
+@Time ： 2025/5/14 16:24
+@Auth ： rss
+@IDE ：PyCharm
+@Email：renshangsi@gmail.com
+"""
+
 from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition
 from kivy.uix.boxlayout import BoxLayout
@@ -12,11 +21,12 @@ from kivy.animation import Animation
 from kivy.core.window import Window
 import random
 
-from nback_logic import NBackGame
+from app.core import NBackGame
 
-SPLASH_IMAGE_PATH = r"E:\pyproject\dual-Nback-IOS-game\icon\Rick-SunRaise.jpg"
-ICON_PATH = r"E:\pyproject\dual-Nback-IOS-game\icon\64x64icon1.png"
-INFO_ICON_PATH = r"E:\pyproject\dual-Nback-IOS-game\icon\info_icon.jpg"
+SPLASH_IMAGE_PATH = r"app/resources/Loading.jpg"
+ICON_PATH = r"app/resources/LOGO_2.png"
+INFO_ICON_PATH = r"app/resources/info_icon.jpg"
+
 
 class SplashScreen(Screen):
     def on_enter(self, *args):
@@ -36,17 +46,18 @@ class SplashScreen(Screen):
             anim.bind(on_complete=self.go_to_main_menu)
             anim.start(self.splash_image)
         else:
-            self.go_to_main_menu(None, None) # Go directly if image failed
+            self.go_to_main_menu(None, None)  # Go directly if image failed
 
     def go_to_main_menu(self, animation, widget):
         self.manager.current = 'main_menu'
+
 
 class MainMenuScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.selected_n_value = 2
         self.min_n = 1
-        self.max_n = 7 
+        self.max_n = 7
 
         layout = BoxLayout(orientation='vertical', padding=50, spacing=20)
         title = Label(text="Dual N-Back Game", font_size='32sp', size_hint_y=0.2)
@@ -57,7 +68,7 @@ class MainMenuScreen(Screen):
         self.n_value_display = Label(text=str(self.selected_n_value), font_size='24sp')
         btn_decrease_n = Button(text="-", font_size='24sp', on_press=self.decrease_n)
         btn_increase_n = Button(text="+", font_size='24sp', on_press=self.increase_n)
-        
+
         n_value_layout.add_widget(n_label)
         n_value_layout.add_widget(btn_decrease_n)
         n_value_layout.add_widget(self.n_value_display)
@@ -85,20 +96,22 @@ class MainMenuScreen(Screen):
         game_screen.set_n_value(self.selected_n_value)
         self.manager.current = 'game_screen'
 
+
 class NBackGrid(GridLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.cols = 3
         self.spacing = 5
-        self.padding = 5 # Padding around the grid itself
+        self.padding = 5  # Padding around the grid itself
         self.cells = []
         for i in range(9):
-            cell_label = Label(text="") 
+            cell_label = Label(text="")
             with cell_label.canvas.before:
                 Color(0.2, 0.2, 0.2, 1)
                 self.cell_bg_rect = Rectangle(size=cell_label.size, pos=cell_label.pos)
-                Color(0.5, 0.5, 0.5, 1) 
-                self.cell_border = Line(rectangle=(cell_label.x, cell_label.y, cell_label.width, cell_label.height), width=1.2)
+                Color(0.5, 0.5, 0.5, 1)
+                self.cell_border = Line(rectangle=(cell_label.x, cell_label.y, cell_label.width, cell_label.height),
+                                        width=1.2)
             cell_label.bind(size=self._update_cell_graphics, pos=self._update_cell_graphics)
             cell_label._highlighted = False
             self.cells.append(cell_label)
@@ -112,18 +125,20 @@ class NBackGrid(GridLayout):
             else:
                 Color(0.2, 0.2, 0.2, 1)
             Rectangle(size=instance.size, pos=instance.pos)
-            Color(0.5, 0.5, 0.5, 1) 
-            Line(rectangle=(instance.x +1, instance.y+1, instance.width-2, instance.height-2), width=1.2) # Adjusted for spacing
+            Color(0.5, 0.5, 0.5, 1)
+            Line(rectangle=(instance.x + 1, instance.y + 1, instance.width - 2, instance.height - 2),
+                 width=1.2)  # Adjusted for spacing
 
     def highlight_cell(self, index):
         for i, cell_label in enumerate(self.cells):
             cell_label._highlighted = (i == index)
             self._update_cell_graphics(cell_label, None)
-    
+
     def clear_highlight(self):
         for cell_label in self.cells:
             cell_label._highlighted = False
             self._update_cell_graphics(cell_label, None)
+
 
 class GameScreen(Screen):
     def __init__(self, **kwargs):
@@ -147,11 +162,11 @@ class GameScreen(Screen):
             self.game_icon = Label(text="Icon", size_hint_x=None, width=64)
         self.n_value_label = Label(text=f"N = {self.current_n_value}", size_hint_x=0.2, font_size='18sp')
         self.score_label = Label(text="Score: 0", size_hint_x=0.5, font_size='18sp')
-        
+
         self.info_button = Button(text="?", size_hint_x=None, width=64, font_size='24sp')
         self.info_button.bind(on_press=self.show_info_popup_on_press)
         self.info_button.bind(on_release=self.dismiss_info_popup_on_release)
-        
+
         top_bar.add_widget(self.game_icon)
         top_bar.add_widget(self.n_value_label)
         top_bar.add_widget(self.score_label)
@@ -166,16 +181,20 @@ class GameScreen(Screen):
         self.layout.add_widget(stimuli_layout)
 
         controls_layout = GridLayout(cols=2, size_hint_y=None, height=100, spacing=10)
-        self.visual_match_button = Button(text="Visual Match", on_press=self.on_visual_match, disabled=True, font_size='18sp')
-        self.audio_match_button = Button(text="Audio Match", on_press=self.on_audio_match, disabled=True, font_size='18sp')
+        self.visual_match_button = Button(text="Visual Match", on_press=self.on_visual_match, disabled=True,
+                                          font_size='18sp')
+        self.audio_match_button = Button(text="Audio Match", on_press=self.on_audio_match, disabled=True,
+                                         font_size='18sp')
         controls_layout.add_widget(self.visual_match_button)
         controls_layout.add_widget(self.audio_match_button)
         self.layout.add_widget(controls_layout)
 
-        self.back_to_menu_button = Button(text="Back to Menu", on_press=self.go_to_main_menu, size_hint_y=None, height=50, font_size='18sp')
+        self.back_to_menu_button = Button(text="Back to Menu", on_press=self.go_to_main_menu, size_hint_y=None,
+                                          height=50, font_size='18sp')
         self.layout.add_widget(self.back_to_menu_button)
-        
-        self.feedback_label = Label(text="Select N and Start from Main Menu", size_hint_y=None, height=30, font_size='16sp')
+
+        self.feedback_label = Label(text="Select N and Start from Main Menu", size_hint_y=None, height=30,
+                                    font_size='16sp')
         self.layout.add_widget(self.feedback_label)
         self.add_widget(self.layout)
 
@@ -194,12 +213,12 @@ class GameScreen(Screen):
         if not self.game_in_progress and self.game:
             self.game.generate_sequences()
             self.game_in_progress = True
-            self.back_to_menu_button.disabled = True 
+            self.back_to_menu_button.disabled = True
             self.score_label.text = "Score: 0"
             self.feedback_label.text = "Game Started! Get Ready..."
             self.visual_match_button.disabled = True
             self.audio_match_button.disabled = True
-            Clock.schedule_once(self.present_stimulus, 1) 
+            Clock.schedule_once(self.present_stimulus, 1)
 
     def present_stimulus(self, dt):
         if not self.game_in_progress: return
@@ -207,16 +226,16 @@ class GameScreen(Screen):
             self.end_game()
             return
 
-        if self.game.get_current_trial_number() > self.game.n_value: 
+        if self.game.get_current_trial_number() > self.game.n_value:
             self.game.record_response_and_score(self.user_responded_visual, self.user_responded_audio)
             self.score_label.text = f"Score: {self.game.get_score()}"
-        
+
         self.user_responded_visual = False
         self.user_responded_audio = False
-        self.visual_match_button.background_color = [1,1,1,1]
-        self.audio_match_button.background_color = [1,1,1,1]
+        self.visual_match_button.background_color = [1, 1, 1, 1]
+        self.audio_match_button.background_color = [1, 1, 1, 1]
 
-        visual_stim, audio_stim = self.game.next_stimuli() 
+        visual_stim, audio_stim = self.game.next_stimuli()
 
         if visual_stim is not None:
             self.visual_grid.highlight_cell(visual_stim)
@@ -260,7 +279,7 @@ class GameScreen(Screen):
         self.audio_match_button.disabled = True
         self.visual_grid.clear_highlight()
         self.audio_label.text = "Audio: -"
-        
+
         final_score = self.game.get_score() if self.game else 0
         max_score = self.game.get_max_possible_score() if self.game else 0
         score_text = f"Game Over!\nFinal Score: {final_score} / {max_score}"
@@ -269,9 +288,9 @@ class GameScreen(Screen):
         popup_content.add_widget(Label(text=score_text, font_size='24sp', halign='center'))
         close_button = Button(text="OK", size_hint_y=None, height=50, font_size='18sp')
         popup_content.add_widget(close_button)
-        
+
         self.score_popup = Popup(title="Game Finished", content=popup_content,
-                            size_hint=(0.6, None), height=Window.height*0.4, auto_dismiss=False)
+                                 size_hint=(0.6, None), height=Window.height * 0.4, auto_dismiss=False)
         close_button.bind(on_press=self.dismiss_score_popup)
         self.score_popup.open()
 
@@ -280,7 +299,7 @@ class GameScreen(Screen):
         self.go_to_main_menu(None)
 
     def go_to_main_menu(self, instance):
-        self.game_in_progress = False 
+        self.game_in_progress = False
         if hasattr(self, 'score_popup') and self.score_popup.content and self.score_popup.content.parent:
             self.score_popup.dismiss()
         if self.info_popup_instance and self.info_popup_instance.content and self.info_popup_instance.content.parent:
@@ -296,23 +315,24 @@ class GameScreen(Screen):
                      f"- Visual: Click 'Visual Match' if the square's position is the same as N trials ago.\n"
                      f"- Audio: Click 'Audio Match' if the displayed number is the same as N trials ago.\n"
                      f"- N is currently set to: {self.current_n_value}\n\n"
-                     f"Developer: Manus AI Agent")
-        
+                     f"Developer: Shangsi Rick Ren (renshangsi@gmail.com) plus Manus")
+
         popup_main_content = BoxLayout(orientation='vertical', padding=10, spacing=5)
-        info_label = Label(text=info_text, halign='left', valign='top', color=(1,1,1,1), font_size='14sp')
+        info_label = Label(text=info_text, halign='left', valign='top', color=(1, 1, 1, 1), font_size='14sp')
         info_label.bind(size=lambda *x: setattr(info_label, 'text_size', (info_label.width, None)))
         popup_main_content.add_widget(info_label)
 
-        wrapper = BoxLayout(opacity=0.9) 
+        wrapper = BoxLayout(opacity=0.9)
         with wrapper.canvas.before:
             Color(0.15, 0.15, 0.15, 0.9)
             self.info_popup_bg_rect = Rectangle(size=wrapper.size, pos=wrapper.pos)
         wrapper.bind(size=self._update_info_popup_bg, pos=self._update_info_popup_bg)
         wrapper.add_widget(popup_main_content)
-        
-        self.info_popup_instance = Popup(title='Game Info & Credits', content=wrapper, 
+
+        self.info_popup_instance = Popup(title='Game Info & Credits', content=wrapper,
                                          size_hint=(None, None), size=(Window.width * 0.8, Window.height * 0.6),
-                                         auto_dismiss=False, title_color=(1,1,1,1), separator_color=(0.3,0.3,0.3,1))
+                                         auto_dismiss=False, title_color=(1, 1, 1, 1),
+                                         separator_color=(0.3, 0.3, 0.3, 1))
         self.info_popup_instance.open()
 
     def _update_info_popup_bg(self, instance, value):
@@ -325,6 +345,7 @@ class GameScreen(Screen):
             self.info_popup_instance.dismiss()
             self.info_popup_instance = None
 
+
 class NBackApp(App):
     def build(self):
         Window.clearcolor = (0.1, 0.1, 0.1, 1)
@@ -334,6 +355,7 @@ class NBackApp(App):
         sm.add_widget(MainMenuScreen(name='main_menu'))
         sm.add_widget(GameScreen(name='game_screen'))
         return sm
+
 
 if __name__ == '__main__':
     NBackApp().run()

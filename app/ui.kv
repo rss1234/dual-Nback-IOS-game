@@ -1,0 +1,31 @@
+<GameLayout>:
+    orientation: "vertical"
+    padding: 20
+    spacing: 20
+
+    Label:
+        id: position_label
+        text: "Position: "
+        font_size: '28sp'
+        size_hint_y: None
+        height: self.texture_size[1] + 20
+
+    Label:
+        id: sound_label
+        text: "Sound: "
+        font_size: '28sp'
+        size_hint_y: None
+        height: self.texture_size[1] + 20
+
+    BoxLayout:
+        size_hint_y: None
+        height: 60
+        spacing: 10
+
+        Button:
+            text: "Match Position"
+            on_release: root.match_position()
+
+        Button:
+            text: "Match Sound"
+            on_release: root.match_sound()
