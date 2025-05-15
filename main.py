@@ -20,12 +20,23 @@ from kivy.graphics import Color, Rectangle, Line
 from kivy.animation import Animation
 from kivy.core.window import Window
 import random
+import os
+import sys
 
 from app.core import NBackGame
 
-SPLASH_IMAGE_PATH = r"app/resources/Loading.jpg"
-ICON_PATH = r"app/resources/LOGO_2.png"
-INFO_ICON_PATH = r"app/resources/info_icon.jpg"
+
+# # PyInstaller 会在打包后将资源复制到临时路径中运行，因此还需要在代码中这样处理资源路径（建议统一处理）：
+def resource_path(relative_path):
+    """获取资源文件路径（兼容开发和 PyInstaller）"""
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(os.path.abspath("."), relative_path)
+
+
+SPLASH_IMAGE_PATH = resource_path(r"app/resources/Loading.jpg")
+ICON_PATH = resource_path(r"app/resources/LOGO_2.png")
+INFO_ICON_PATH = resource_path(r"app/resources/info_icon.jpg")
 
 
 class SplashScreen(Screen):
